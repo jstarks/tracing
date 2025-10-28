@@ -2771,7 +2771,7 @@ macro_rules! level_enabled {
 #[doc(hidden)]
 macro_rules! callsite_enabled {
     ($lvl:expr, $callsite:expr) => {
-        $lvl <= $crate::level_filters::STATIC_MAX_LEVEL && $crate::__macro_support::__is_enabled($callsite)
+        $lvl <= $crate::level_filters::STATIC_MAX_LEVEL && $crate::__macro_support::__is_enabled(&$callsite)
     };
 }
 
