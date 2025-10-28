@@ -1009,8 +1009,13 @@ pub mod __macro_support {
     /// by the `tracing` macros, but it is not part of the stable versioned API.
     /// Breaking changes to this module may occur in small-numbered versions
     /// without warning.
-    pub fn __is_enabled(meta: &Metadata<'static>, interest: Interest) -> bool {
-        interest.is_always() || crate::dispatcher::get_default(|default| default.enabled(meta))
+    #[inline]
+    pub fn __is_enabled(callsite: &'static MacroCallsite) -> bool {
+        fn is_enabled(interest: Interest, callsite: &MacroCallsite) -> bool {
+            interest.is_always() || crate::dispatcher::get_default(|default| default.enabled(callsite.metadata()))
+        }
+        let interest = callsite.interest();
+        !interest.is_never() && is_enabled(interest, callsite)
     }
 
     /// /!\ WARNING: This is *not* a stable API! /!\

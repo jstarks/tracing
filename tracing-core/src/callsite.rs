@@ -249,7 +249,7 @@ pub fn register(callsite: &'static dyn Callsite) {
         CALLSITES.push_dyn(callsite);
     }
 
-    rebuild_callsite_interest(callsite, &DISPATCHERS.rebuilder());
+    rebuild_callsite_interest(callsite, LevelFilter::current(), &DISPATCHERS.rebuilder());
 }
 
 static CALLSITES: Callsites = Callsites {
@@ -316,7 +316,7 @@ impl DefaultCallsite {
             Ok(_) => {
                 // Okay, we advanced the state, try to register the callsite.
                 CALLSITES.push_default(self);
-                rebuild_callsite_interest(self, &DISPATCHERS.rebuilder());
+                rebuild_callsite_interest(self, LevelFilter::current(), &DISPATCHERS.rebuilder());
                 self.registration.store(Self::REGISTERED, Ordering::Release);
             }
             // Great, the callsite is already registered! Just load its
@@ -415,10 +415,10 @@ impl Callsites {
             }
         });
 
-        self.for_each(|callsite| {
-            rebuild_callsite_interest(callsite, &dispatchers);
-        });
         LevelFilter::set_max(max_level);
+        self.for_each(|callsite| {
+            rebuild_callsite_interest(callsite, max_level, &dispatchers);
+        });
     }
 
     /// Push a `dyn Callsite` trait object to the callsite registry.
@@ -489,9 +489,14 @@ pub(crate) fn register_dispatch(dispatch: &Dispatch) {
 
 fn rebuild_callsite_interest(
     callsite: &'static dyn Callsite,
+    max_level: LevelFilter,
     dispatchers: &dispatchers::Rebuilder<'_>,
 ) {
     let meta = callsite.metadata();
+    if max_level > *meta.level() {
+        callsite.set_interest(Interest::never());
+        return;
+    }
 
     let mut interest = None;
     dispatchers.for_each(|dispatch| {
