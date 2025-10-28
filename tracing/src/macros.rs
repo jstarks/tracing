@@ -657,7 +657,7 @@ macro_rules! event {
             target: $target,
             parent: $parent,
             $lvl,
-            { message = $crate::__macro_support::format_args!($($arg)+), $($fields)* }
+            { message = *$crate::format_args_as_value!($($_as_valuearg)+), $($fields)* }
         )
     );
     (name: $name:expr, target: $target:expr, parent: $parent:expr, $lvl:expr, $($k:ident).+ = $($fields:tt)* ) => (
@@ -708,7 +708,7 @@ macro_rules! event {
             name: $name,
             target: $target,
             $lvl,
-            { message = $crate::__macro_support::format_args!($($arg)+), $($fields)* }
+            { message = *$crate::format_args_as_value!($($_as_valuearg)+), $($fields)* }
         )
     );
     (name: $name:expr, target: $target:expr, $lvl:expr, $($k:ident).+ = $($fields:tt)* ) => (
@@ -766,7 +766,7 @@ macro_rules! event {
             target: $target,
             parent: $parent,
             $lvl,
-            { message = $crate::__macro_support::format_args!($($arg)+), $($fields)* }
+            { message = *$crate::format_args_as_value!($($_as_valuearg)+), $($fields)* }
         )
     );
     (target: $target:expr, parent: $parent:expr, $lvl:expr, $($k:ident).+ = $($fields:tt)* ) => (
@@ -819,7 +819,7 @@ macro_rules! event {
             name: $name,
             parent: $parent,
             $lvl,
-            { message = $crate::__macro_support::format_args!($($arg)+), $($fields)* }
+            { message = *$crate::format_args_as_value!($($_as_valuearg)+), $($fields)* }
         )
     );
     (name: $name:expr, parent: $parent:expr, $lvl:expr, $($k:ident).+ = $($fields:tt)* ) => (
@@ -869,7 +869,7 @@ macro_rules! event {
         $crate::event!(
             name: $name,
             $lvl,
-            { message = $crate::__macro_support::format_args!($($arg)+), $($fields)* }
+            { message = *$crate::format_args_as_value!($($_as_valuearg)+), $($fields)* }
         )
     );
     (name: $name:expr, $lvl:expr, $($k:ident).+ = $($fields:tt)* ) => (
@@ -924,7 +924,7 @@ macro_rules! event {
         $crate::event!(
             target: $target,
             $lvl,
-            { message = $crate::__macro_support::format_args!($($arg)+), $($fields)* }
+            { message = *$crate::format_args_as_value!($($_as_valuearg)+), $($fields)* }
         )
     );
     (target: $target:expr, $lvl:expr, $($k:ident).+ = $($fields:tt)* ) => (
@@ -940,7 +940,7 @@ macro_rules! event {
             target: module_path!(),
             parent: $parent,
             $lvl,
-            { message = $crate::__macro_support::format_args!($($arg)+), $($fields)* }
+            { message = *$crate::format_args_as_value!($($_as_valuearg)+), $($fields)* }
         )
     );
     (parent: $parent:expr, $lvl:expr, $($k:ident).+ = $($field:tt)*) => (
@@ -1000,14 +1000,14 @@ macro_rules! event {
         $crate::event!(
             target: module_path!(),
             $lvl,
-            { message = $crate::__macro_support::format_args!($($arg)+), $($fields)* }
+            { message = *$crate::format_args_as_value!($($_as_valuearg)+), $($fields)* }
         )
     );
     ( $lvl:expr, { $($fields:tt)* }, $($arg:tt)+ ) => (
         $crate::event!(
             target: module_path!(),
             $lvl,
-            { message = format_args!($($arg)+), $($fields)* }
+            { message = *$crate::format_args_as_value!($($arg)+), $($fields)* }
         )
     );
     ($lvl:expr, $($k:ident).+ = $($field:tt)*) => (
@@ -2964,7 +2964,7 @@ macro_rules! valueset {
 
     // Remainder is unparsable, but exists --- must be format args!
     (@ { $(,)* $($out:expr),* }, $($rest:tt)+) => {
-        $crate::valueset!(@ { ($crate::__macro_support::Option::Some(&$crate::__macro_support::format_args!($($rest)+) as &dyn Value)), $($out),* },)
+        $crate::valueset!(@ { ($crate::__macro_support::Option::Some($crate::format_args_as_value!($($rest)+))), $($out),* },)
     };
 
     // === entry ===
@@ -3076,6 +3076,14 @@ macro_rules! __tracing_stringify {
         }> = $crate::__macro_support::FieldName::new($crate::__macro_support::stringify!($($k).+));
         NAME.as_str()
     }};
+}
+
+#[doc(hidden)]
+#[macro_export]
+macro_rules! format_args_as_value {
+    ($($arg:tt)*) => {
+        $crate::__macro_support::args_as_value(&$crate::__macro_support::args_or_str($crate::__macro_support::format_args!($($arg)*)))
+    };
 }
 
 #[cfg(not(feature = "log"))]

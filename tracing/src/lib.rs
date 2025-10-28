@@ -1126,6 +1126,19 @@ pub mod __macro_support {
                 .finish()
         }
     }
+
+    #[inline]
+    pub fn args_as_value<'a>(r: &'a Result<&'static str, core::fmt::Arguments<'_>>) -> &'a dyn crate::Value {
+        match r {
+            Ok(s) => s,
+            Err(f) => f,
+        }
+    }
+
+    #[inline]
+    pub fn args_or_str(fmt: core::fmt::Arguments<'_>) -> Result<&'static str, core::fmt::Arguments<'_>> {
+        fmt.as_str().ok_or(fmt)
+    }
 }
 
 #[cfg(feature = "log")]
