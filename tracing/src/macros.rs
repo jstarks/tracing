@@ -645,7 +645,7 @@ macro_rules! event {
             target: $target,
             parent: $parent,
             $lvl,
-            { message = *$crate::format_args_as_value!($($_as_valuearg)+), $($fields)* }
+            { message = *$crate::format_args_as_value!($($arg)+), $($fields)* }
         )
     );
     (name: $name:expr, target: $target:expr, parent: $parent:expr, $lvl:expr, $($k:ident).+ = $($fields:tt)* ) => (
@@ -692,7 +692,7 @@ macro_rules! event {
             name: $name,
             target: $target,
             $lvl,
-            { message = *$crate::format_args_as_value!($($_as_valuearg)+), $($fields)* }
+            { message = *$crate::format_args_as_value!($($arg)+), $($fields)* }
         )
     );
     (name: $name:expr, target: $target:expr, $lvl:expr, $($k:ident).+ = $($fields:tt)* ) => (
@@ -746,7 +746,7 @@ macro_rules! event {
             target: $target,
             parent: $parent,
             $lvl,
-            { message = *$crate::format_args_as_value!($($_as_valuearg)+), $($fields)* }
+            { message = *$crate::format_args_as_value!($($arg)+), $($fields)* }
         )
     );
     (target: $target:expr, parent: $parent:expr, $lvl:expr, $($k:ident).+ = $($fields:tt)* ) => (
@@ -795,7 +795,7 @@ macro_rules! event {
             name: $name,
             parent: $parent,
             $lvl,
-            { message = *$crate::format_args_as_value!($($_as_valuearg)+), $($fields)* }
+            { message = *$crate::format_args_as_value!($($arg)+), $($fields)* }
         )
     );
     (name: $name:expr, parent: $parent:expr, $lvl:expr, $($k:ident).+ = $($fields:tt)* ) => (
@@ -841,7 +841,7 @@ macro_rules! event {
         $crate::event!(
             name: $name,
             $lvl,
-            { message = *$crate::format_args_as_value!($($_as_valuearg)+), $($fields)* }
+            { message = *$crate::format_args_as_value!($($arg)+), $($fields)* }
         )
     );
     (name: $name:expr, $lvl:expr, $($k:ident).+ = $($fields:tt)* ) => (
@@ -892,7 +892,7 @@ macro_rules! event {
         $crate::event!(
             target: $target,
             $lvl,
-            { message = *$crate::format_args_as_value!($($_as_valuearg)+), $($fields)* }
+            { message = *$crate::format_args_as_value!($($arg)+), $($fields)* }
         )
     );
     (target: $target:expr, $lvl:expr, $($k:ident).+ = $($fields:tt)* ) => (
@@ -908,7 +908,7 @@ macro_rules! event {
             target: module_path!(),
             parent: $parent,
             $lvl,
-            { message = *$crate::format_args_as_value!($($_as_valuearg)+), $($fields)* }
+            { message = *$crate::format_args_as_value!($($arg)+), $($fields)* }
         )
     );
     (parent: $parent:expr, $lvl:expr, $($k:ident).+ = $($field:tt)*) => (
@@ -968,7 +968,7 @@ macro_rules! event {
         $crate::event!(
             target: module_path!(),
             $lvl,
-            { message = *$crate::format_args_as_value!($($_as_valuearg)+), $($fields)* }
+            { message = *$crate::format_args_as_value!($($arg)+), $($fields)* }
         )
     );
     ( $lvl:expr, { $($fields:tt)* }, $($arg:tt)+ ) => (
